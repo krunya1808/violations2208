@@ -2,10 +2,8 @@
   <b-container fluid>
     <b-jumbotron header="База даних правопорушень ЦБІ">
       <template slot="lead">
-        Сумарна кількість правопорушень: {{ violationsCount }}
+        Сумарна кількість правопорушень: <b-badge variant="primary">{{ violationsCount }}</b-badge>
       </template>
-      <b-tabs pills >
-        <b-tab title="База даних" href="/violations">
           <b-row class="my-2">
             <b-col md="3" class="my-1">
               <b-form-group horizontal label="Фільтр" class="mb-0">
@@ -352,11 +350,6 @@
                 v-model="currentPage"/>
             </b-col>
           </b-row>
-        </b-tab>
-        <b-tab title="Статистика" href="/statistics">
-          <Statistics></Statistics>
-        </b-tab>
-      </b-tabs>
     </b-jumbotron>
   </b-container>
 </template>

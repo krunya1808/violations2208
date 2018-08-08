@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Violations from '@/components/Violations';
 import Statistics from '@/components/Statistics';
+import Authorization from '@/components/Authorization';
 
 
 Vue.use(Router);
@@ -25,6 +26,11 @@ export default new Router({
       path: '/statistics',
       name: 'Statistics',
       component: Statistics,
+    },
+    {
+      path: '/auth',
+      name: 'Auth',
+      component: Authorization,
     },
   ],
   mode: 'history',
