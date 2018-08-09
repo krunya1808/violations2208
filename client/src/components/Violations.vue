@@ -6,7 +6,7 @@
       </template>
           <b-row class="my-2">
             <b-col md="3" class="my-1">
-              <b-form-group horizontal label="Фільтр" class="mb-0">
+              <b-form-group horizontal label="Фільтр" class="mb-0 text-center">
                 <b-input-group>
                   <b-form-input v-model="filter" placeholder="Введіть для пошуку" />
                   <b-input-group-append>
@@ -18,7 +18,7 @@
               </b-form-group>
             </b-col>
             <b-col md="1" class="my-1">
-              <b-form-group horizontal label="Ел." class="mb-0">
+              <b-form-group horizontal label="Ел." class="mb-0 text-center">
                 <b-form-select :options="pageOptions" v-model="perPage" />
               </b-form-group>
             </b-col>
