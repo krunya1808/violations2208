@@ -28,7 +28,7 @@ export default new Router({
       component: Statistics,
     },
     {
-      path: '/auth',
+      path: '/',
       name: 'Auth',
       component: Authorization,
     },

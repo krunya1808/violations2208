@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_pymongo import PyMongo
+import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # configuration
 DEBUG = True
@@ -9,14 +11,81 @@ DEBUG = True
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+#jwt = JWTManager(app)
+
 #database config
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/violdb'
 
 mongo = PyMongo(app)
 violations = mongo.db.violations
+users = mongo.db.users
 # enable CORS
 CORS(app)
 
+'''@app.route('/auth', methods=['POST'])
+def login():
+    if not request_is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
+
+    if username != 'test' or password != 'test':
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    access_token = create_access_token(identity=username)
+    return jsonify(access_token=access_token), 200'''
+
+@app.route('/users', methods=['GET'])
+def get_all_users():
+    output = []
+    for q in users.find():
+        output.append({"public_id": q["public_id"], "name": q["name"], "login": q["login"],
+                      "password": q["password"], "admin": q["admin"]})
+    return jsonify({'users': output})
+
+@app.route('/user/<public_id>', methods=['GET'])
+def get_one_user(public_id):
+    user = users.find_one({'public_id' : public_id})
+    if not user:
+        return jsonify({'message': 'No user found!'})
+    user_data = {"public_id" : user["public_id"], "name" : user["name"], "login" : user["login"],
+                 "password" : user["password"], "admin" : user["admin"]}
+    return jsonify({'user' : user_data})
+
+@app.route('/user/<public_id>', methods=['DELETE'])
+def get_one_user(public_id):
+    user = users.delete_one({'public_id' : public_id})
+    if not user:
+        return jsonify({'message': 'No user found!'})
+
+    return jsonify({'message' : 'User has been deleted'})
+
+@app.route('/user/<public_id>', methods=['PUT'])
+def get_one_user(public_id):
+    data = request.get_json()
+
+    hashed_pass = generate_password_hash(data['password'], method='sha256')
+
+    user = users.update_one({'public_id' : public_id}, {'$set': {'name': data['name'],
+        'login': data['login'], 'password' : hashed_pass, 'admin' : data['admin']}})
+    if not user:
+        return jsonify({'message' : 'No user found!'})
+
+    return jsonify({'message' : 'User was updated'})
+
+@app.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+
+    hashed_pass = generate_password_hash(data['password'], method='sha256')
+
+    users.insert_one({"public_id": str(uuid.uuid4()), "name": data['name'], "password": hashed_pass,
+                      "login": data['login'], "admin": False})
+    return jsonify({'message' : 'New user created'})
 
 @app.route('/violations', methods=['GET'])
 def all_violations():
@@ -72,4 +141,4 @@ def add_violation():
 
     return jsonify({'result' : output})
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

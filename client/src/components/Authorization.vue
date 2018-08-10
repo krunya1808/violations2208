@@ -58,10 +58,10 @@ export default {
   },
   computed: {
     loginState() {
-      if (this.form.login.length > 6) {
+      if (this.form.login.length >= 3) {
         return true;
       }
-      if (this.form.login.length < 6) {
+      if (this.form.login.length < 3) {
         return false;
       }
     },
