@@ -174,7 +174,6 @@
             <b-modal
               id="editViolationModal"
               ref="editViolationModal"
-              @ok="editViolation(violation, violation.index)"
               size="lg"
               title="Редагування запису"
               header-bg-variant="dark"
@@ -306,6 +305,17 @@
                   </b-col>
                 </b-row>
               </b-container>
+              <div slot="modal-footer" class="w-100">
+                <b-btn class="float-left"
+                       variant="danger"
+                       @click="removeViolation(violation.index)">Видалити</b-btn>
+                <b-btn class="float-right"
+                       variant="primary"
+                       @click="editViolation(violation, violation.index)">Ok</b-btn>
+                <b-btn class="float-right mx-2"
+                       variant="secondary"
+                       @click="hideEditModal">Close</b-btn>
+              </div>
             </b-modal>
           </b-row>
           <b-table
@@ -316,8 +326,7 @@
             :per-page="perPage"
             :filter="filter"
             @filtered="onFiltered"
-            @row-dblclicked="rowdClick"
-            @row-hovered="rowHover">
+            @row-dblclicked="rowdClick">
             <template slot="index" slot-scope="row">
               <b-button size="sm" @click.stop="row.toggleDetails" class="mr-2" variant="primary">
                 {{ row.value }}
@@ -428,9 +437,6 @@ export default {
       this.violation = item;
       this.$refs.editViolationModal.show();
     },
-    rowHover() {
-
-    },
     clearModal() {
       this.violation.whoFound = '';
       this.violation.date = '';
@@ -452,6 +458,9 @@ export default {
     hideAddModal() {
       this.$refs.addViolationModal.hide();
     },
+    hideEditModal() {
+      this.$refs.editViolationModal.hide();
+    },
     createViolation() {
       const newViolation = {
         whoFound: this.violation.whoFound,
@@ -469,19 +478,19 @@ export default {
         incomeDoc: this.violation.incomeDoc,
       };
       axios.post('http://localhost:5000/violation_new', newViolation, {
-
       });
       this.clearModal();
       this.hideAddModal();
     },
     editViolation(violation, index) {
-      console.log(index);
       const path = 'http://localhost:5000/violation_edit/' + index;
       axios.put(path, violation);
+      this.hideEditModal();
     },
     removeViolation(index) {
       const path = 'http://localhost:5000/violation_delete/' + index;
       axios.delete(path);
+      this.hideEditModal();
     },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
