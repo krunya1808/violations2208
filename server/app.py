@@ -22,7 +22,8 @@ users = mongo.db.users
 # enable CORS
 CORS(app)
 
-'''@app.route('/auth', methods=['POST'])
+
+@app.route('/auth', methods=['POST'])
 def login():
     if not request_is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
@@ -37,10 +38,10 @@ def login():
         return jsonify({"msg": "Bad username or password"}), 401
 
     access_token = create_access_token(identity=username)
-    return jsonify(access_token=access_token), 200'''
+    return jsonify(access_token=access_token), 200
 
 @app.route('/users', methods=['GET'])
-def get_all_users():
+def getAll_users():
     output = []
     for q in users.find():
         output.append({"public_id": q["public_id"], "name": q["name"], "login": q["login"],
@@ -48,7 +49,7 @@ def get_all_users():
     return jsonify({'users': output})
 
 @app.route('/user/<public_id>', methods=['GET'])
-def get_one_user(public_id):
+def get_user(public_id):
     user = users.find_one({'public_id' : public_id})
     if not user:
         return jsonify({'message': 'No user found!'})
@@ -57,7 +58,7 @@ def get_one_user(public_id):
     return jsonify({'user' : user_data})
 
 @app.route('/user/<public_id>', methods=['DELETE'])
-def get_one_user(public_id):
+def delete_user(public_id):
     user = users.delete_one({'public_id' : public_id})
     if not user:
         return jsonify({'message': 'No user found!'})
@@ -65,17 +66,16 @@ def get_one_user(public_id):
     return jsonify({'message' : 'User has been deleted'})
 
 @app.route('/user/<public_id>', methods=['PUT'])
-def get_one_user(public_id):
+def edit_user(public_id):
     data = request.get_json()
 
     hashed_pass = generate_password_hash(data['password'], method='sha256')
-
-    user = users.update_one({'public_id' : public_id}, {'$set': {'name': data['name'],
+    if users.find_one({'public_id' : public_id}):
+        users.update_one({'public_id' : public_id}, {'$set': {'name': data['name'],
         'login': data['login'], 'password' : hashed_pass, 'admin' : data['admin']}})
-    if not user:
-        return jsonify({'message' : 'No user found!'})
-
-    return jsonify({'message' : 'User was updated'})
+        return jsonify({'message': 'User was updated'})
+    else:
+        return jsonify({'message' : 'No users found!'})
 
 @app.route('/user', methods=['POST'])
 def create_user():
@@ -99,15 +99,31 @@ def all_violations():
                        "incomeDoc" : q["incomeDoc"]})
     return jsonify({ 'data': output})
 
-#@app.route('/violation_edit/<int:viol_id>', methods=['PUT'])
-#def update_violation(viol_id):
-
-@app.route('/violation_delete/<int:data_index>', methods=['DELETE'])
+@app.route('/violation_delete/<data_index>', methods=['DELETE'])
 def delete_violation(data_index):
-    print(data_index)
-    return jsonify({'Deleted', True})
+    data_index = int(data_index) #исправить !
+    if violations.find_one({'index': data_index}):
+        violations.delete_one({'index' : data_index})
+        return jsonify({'message' : 'Violation has been deleted'})
+    else:
+        return jsonify({'message': 'No violation found!'})
 
-    #mycollection.update_one({'_id':mongo_id}, {"$set": post}, upsert=False)
+@app.route('/violation_edit/<data_index>', methods=['PUT'])
+def edit_violation(data_index):
+    data_index = int(data_index) #исправить !
+    data = request.get_json()
+
+    if violations.find_one({'index' : data_index}):
+        violations.update_one({'index' : data_index}, {'$set': {"date": data["date"],
+            "whoFound": data["whoFound"], "network": data["network"],
+            "ipAdress" : data["ipAdress"], "department" : data["department"],
+            "militaryUnit" : data["militaryUnit"], "deslocation" : data["deslocation"],
+            "subordinate" : data["subordinate"], "normDoc" : data["normDoc"],
+            "violCont" : data["violCont"], "volumeInf" : data["volumeInf"],
+            "sourceDoc" : data["sourceDoc"], "incomeDoc" : data["incomeDoc"]}})
+        return jsonify({'message': 'Violation was updated'})
+    else:
+        return jsonify({'message' : 'No violations found!'})
 
 @app.route('/violation_new', methods=['POST'])
 def add_violation():

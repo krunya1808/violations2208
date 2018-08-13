@@ -34,7 +34,7 @@
 
               </b-form-checkbox-group>
             </b-form-group>
-            <b-button @click="ok" type="submit" variant="primary" class="but">Вхід</b-button>
+            <b-button type="submit" variant="primary" class="but">Вхід</b-button>
           </b-form>
       </b-col>
       <b-col sm="4"></b-col>
@@ -42,6 +42,8 @@
 
   </b-container>
 </template>
+
+import axios from 'axios';
 
 <script>
 export default {
@@ -75,12 +77,8 @@ export default {
     },
   },
   methods: {
-    ok() {
-      if (this.loginState && this.passwordState) {
-        alert('ok');
-      } else {
-        alert('error');
-      }
+    auth() {
+
     },
   },
 };

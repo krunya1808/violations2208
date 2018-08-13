@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-jumbotron header="База даних правопорушень ЦБІ">
+    <b-jumbotron header="База даних порушень безпеки інформації">
       <template slot="lead">
         Сумарна кількість правопорушень: <b-badge variant="primary">{{ violationsCount }}</b-badge>
       </template>
@@ -24,7 +24,6 @@
             </b-col>
             <b-col md="3" class="my-1">
               <b-btn v-b-modal.addViolationModal variant="primary">Новий запис</b-btn>
-              <b-btn variant="danger">Видалити запис</b-btn>
             </b-col>
             <b-modal
               id="addViolationModal"
@@ -175,7 +174,7 @@
             <b-modal
               id="editViolationModal"
               ref="editViolationModal"
-              @ok="editViolation(violation)"
+              @ok="editViolation(violation, violation.index)"
               size="lg"
               title="Редагування запису"
               header-bg-variant="dark"
@@ -285,9 +284,8 @@
                 </b-row>
                 <b-row class="mb-4">
                   <b-col>
-                    <b-progress value="inputFUploadProgress"
-                                max="100"
-                                show-progress
+                    <b-progress :value="inputFUploadProgress"
+                                :max="100"
                                 animated></b-progress>
                   </b-col>
                 </b-row>
@@ -302,9 +300,8 @@
                 </b-row>
                 <b-row class="mb-4">
                   <b-col>
-                    <b-progress value="fileUploadProgress"
-                                max="100"
-                                show-progress
+                    <b-progress :value="outputFUploadProgress"
+                                :max="100"
                                 animated></b-progress>
                   </b-col>
                 </b-row>
@@ -319,7 +316,6 @@
             :per-page="perPage"
             :filter="filter"
             @filtered="onFiltered"
-            @row-clicked="rowsClick"
             @row-dblclicked="rowdClick"
             @row-hovered="rowHover">
             <template slot="index" slot-scope="row">
@@ -374,6 +370,7 @@ export default {
         'ІСД-інтернет', 'АСУ-дніпро',
       ],
       violation: {
+        index: '',
         whoFound: '',
         date: '',
         network: '',
@@ -427,9 +424,6 @@ export default {
           this.violationsCount = response.data.data.length;
         });
     },
-    rowsClick(item) {
-
-    },
     rowdClick(item) {
       this.violation = item;
       this.$refs.editViolationModal.show();
@@ -474,22 +468,19 @@ export default {
         sourceDoc: this.violation.sourceDoc,
         incomeDoc: this.violation.incomeDoc,
       };
-      newViolation.append('doc', this.inputFile, this.inputFile.name);
-      newViolation.append('doc', this.outputFile, this.outputFile.name);
       axios.post('http://localhost:5000/violation_new', newViolation, {
-        onUploadProgress: uploadEvent => {
-          this.inputFUploadProgress = Math.round(uploadEvent.loaded / uploadEvent.total * 100);
-          this.outputFUploadProgress = Math.round(uploadEvent.loaded / uploadEvent.total * 100);
-        },
+
       });
       this.clearModal();
       this.hideAddModal();
     },
-    editViolation(violation) {
-      axios.put('http://localhost:5000/violation_edit', violation);
+    editViolation(violation, index) {
+      console.log(index);
+      const path = 'http://localhost:5000/violation_edit/' + index;
+      axios.put(path, violation);
     },
-    removeViolation(violation) {
-      const path = 'http://localhost:5000/violation/${'
+    removeViolation(index) {
+      const path = 'http://localhost:5000/violation_delete/' + index;
       axios.delete(path);
     },
     onFiltered(filteredItems) {
