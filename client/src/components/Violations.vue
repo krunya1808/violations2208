@@ -97,7 +97,7 @@
                     type="text"
                     v-model="violation.normDoc">
                   </b-form-input></b-col>
-                  <b-col sm="2">Обсяг інф.</b-col>
+                  <b-col sm="2">Обсяг інф. (мб)</b-col>
                   <b-col sm="4"><b-form-input
                     type="text"
                     v-model="violation.volumeInf">
@@ -308,10 +308,10 @@
               <div slot="modal-footer" class="w-100">
                 <b-btn class="float-left"
                        variant="danger"
-                       @click="removeViolation(violation.index)">Видалити</b-btn>
+                       @click="removeViolation(this.violation.publicId, violation)">Видалити</b-btn>
                 <b-btn class="float-right"
                        variant="primary"
-                       @click="editViolation(violation, violation.index)">Ok</b-btn>
+                       @click="editViolation(violation.publicId, violation)">Ok</b-btn>
                 <b-btn class="float-right mx-2"
                        variant="secondary"
                        @click="hideEditModal">Close</b-btn>
@@ -393,6 +393,7 @@ export default {
         volumeInf: '',
         sourceDoc: '',
         incomeDoc: '',
+        publicId: '',
       },
       fields: {
         index: { label: '№', sortable: true },
@@ -406,6 +407,7 @@ export default {
         subordinate: { label: 'Підпорядкування', sortable: true },
         normDoc: { label: 'Нормативний документ' },
         violCont: { label: 'Зміст порушення' },
+        volumeInf: { label: 'Обсяг інф (мб)' },
         sourceDoc: { label: '№ вих.' },
         incomeDoc: { label: '№ вх.' },
       },
@@ -481,16 +483,18 @@ export default {
       });
       this.clearModal();
       this.hideAddModal();
+      this.violations.push(newViolation);
     },
-    editViolation(violation, index) {
-      const path = 'http://localhost:5000/violation_edit/' + index;
+    editViolation(publicId, violation) {
+      const path = 'http://localhost:5000/violation_edit/' + publicId;
       axios.put(path, violation);
       this.hideEditModal();
     },
-    removeViolation(index) {
-      const path = 'http://localhost:5000/violation_delete/' + index;
+    removeViolation(publicId, violation) {
+      const path = 'http://localhost:5000/violation_delete/' + publicId;
       axios.delete(path);
       this.hideEditModal();
+      this.violations.pop(violation);
     },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
