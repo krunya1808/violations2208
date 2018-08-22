@@ -426,7 +426,7 @@ export default {
   },
   methods: {
     getViolations() {
-      const path = 'http://localhost:5000/violations';
+      const path = 'http://192.168.0.104:5000/violations';
       axios.get(path)
         .then((response) => {
           this.violations = response.data.data;
@@ -477,18 +477,18 @@ export default {
         sourceDoc: this.violation.sourceDoc,
         incomeDoc: this.violation.incomeDoc,
       };
-      axios.post('http://localhost:5000/violation_new', newViolation, {
+      axios.post('http://192.168.0.104:5000/violation_new', newViolation, {
       });
       this.clearModal();
       this.hideAddModal();
     },
     editViolation(violation, index) {
-      const path = 'http://localhost:5000/violation_edit/' + index;
+      const path = 'http://192.168.0.104:5000/violation_edit/' + index;
       axios.put(path, violation);
       this.hideEditModal();
     },
     removeViolation(index) {
-      const path = 'http://localhost:5000/violation_delete/' + index;
+      const path = 'http://192.168.0.104:5:5000/violation_delete/' + index;
       axios.delete(path);
       this.hideEditModal();
     },

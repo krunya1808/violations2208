@@ -55,11 +55,15 @@ export default {
         login: '',
         password: '',
         checked: [],
+        stat: '',
       },
     };
   },
   computed: {
     loginState() {
+      if (this.form.login.length < 1) {
+        return null;
+      }
       if (this.form.login.length >= 3) {
         return true;
       }
@@ -68,6 +72,9 @@ export default {
       }
     },
     passwordState() {
+      if (this.form.password.length < 1) {
+        return null;
+      }
       if (this.form.password.length > 4) {
         return true;
       }

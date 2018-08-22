@@ -1,6 +1,9 @@
 <template>
   <div>
-    <b-modal
+    <div class="class11">
+      <p> qwwff </p>
+    </div>
+    <!--<b-modal
       id="deleteModal"
       ref="deleteModal"
       @ok="removeViolation"
@@ -17,13 +20,30 @@
           <h2>Ви дійсно бажаєте видалити запис № {{ row.value}}</h2>
         </b-row>
       </b-container>
-    </b-modal>
+    </b-modal>-->
   </div>
 </template>
+import axios from 'axios';
 
 <script>
+import { AxiosInstance as axios } from 'axios';
+
 export default {
   name: 'Statistics',
+  data() {
+    return {
+      violations: [],
+    };
+  },
+  methods: {
+    getViolations() {
+      const path = 'http://192.168.0.104:5000/violations';
+      axios.get(path)
+        .then((response) => {
+          this.violations = response.data.data;
+        });
+    },
+  },
 };
 </script>
 
