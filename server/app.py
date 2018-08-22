@@ -23,7 +23,7 @@ users = mongo.db.users
 CORS(app)
 
 
-@app.route('/auth', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if not request_is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
@@ -92,7 +92,7 @@ def all_violations():
 
     output = []
     for q in violations.find():
-        output.append({"index": q["index"], "date": q["date"], "whoFound": q["whoFound"], "network": q["network"],
+        output.append({"public_id": q["public_id"], "index": q["index"], "date": q["date"], "whoFound": q["whoFound"], "network": q["network"],
                        "ipAdress" : q["ipAdress"], "department" : q["department"], "militaryUnit" : q["militaryUnit"],
                        "deslocation" : q["deslocation"], "subordinate" : q["subordinate"], "normDoc" : q["normDoc"],
                        "violCont" : q["violCont"], "volumeInf" : q["volumeInf"], "sourceDoc" : q["sourceDoc"],
@@ -101,20 +101,18 @@ def all_violations():
 
 @app.route('/violation_delete/<data_index>', methods=['DELETE'])
 def delete_violation(data_index):
-    data_index = int(data_index) #исправить !
-    if violations.find_one({'index': data_index}):
-        violations.delete_one({'index' : data_index})
+    if violations.find_one({"public_id": data_index}):
+        violations.delete_one({"public_id" : data_index})
         return jsonify({'message' : 'Violation has been deleted'})
     else:
         return jsonify({'message': 'No violation found!'})
 
 @app.route('/violation_edit/<data_index>', methods=['PUT'])
 def edit_violation(data_index):
-    data_index = int(data_index) #исправить !
     data = request.get_json()
 
-    if violations.find_one({'index' : data_index}):
-        violations.update_one({'index' : data_index}, {'$set': {"date": data["date"],
+    if violations.find_one({"public_id" : data_index}):
+        violations.update_one({"public_id" : data_index}, {'$set': {"date": data["date"],
             "whoFound": data["whoFound"], "network": data["network"],
             "ipAdress" : data["ipAdress"], "department" : data["department"],
             "militaryUnit" : data["militaryUnit"], "deslocation" : data["deslocation"],
@@ -142,19 +140,12 @@ def add_violation():
     sourceDoc = request.json['sourceDoc']
     incomeDoc = request.json['incomeDoc']
 
-    violations_id = violations.insert_one({"index": index, "date": date, "whoFound": whoFound, "network": network,
+    violations_id = violations.insert_one({"public_id": str(uuid.uuid4()),"index": index, "date": date, "whoFound": whoFound, "network": network,
                                        "ipAdress" : ipAdress, "department" : department, "militaryUnit" : militaryUnit,
                                         "deslocation" : deslocation, "subordinate" : subordinate, "normDoc" : normDoc,
                                         "violCont" : violCont, "volumeInf" : volumeInf, "sourceDoc" : sourceDoc,
                                         "incomeDoc" : incomeDoc})
-    new_violations = violations.find_one({'_id' : violations_id})
 
-    output = {"index": index, "date": new_violations["date"], "whoFound": new_violations["whoFound"],
-              "network": new_violations["network"], "ipAdress" : new_violations["ipAdress"], "department" : new_violations["department"],
-              "militaryUnit" : new_violations["militaryUnit"], "deslocation" : new_violations["deslocation"], "subordinate" : new_violations["subordinate"],
-              "normDoc" : new_violations["normDoc"], "violCont" : new_violations["violCont"], "volumeInf" : new_violations["volumeInf"],
-              "sourceDoc" : new_violations["sourceDoc"], "incomeDoc" : new_violations["incomeDoc"]}
-
-    return jsonify({'result' : output})
+    return jsonify({'message' : 'violation was added'})
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
