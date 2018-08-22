@@ -289,7 +289,7 @@
                   </b-col>
                 </b-row>
                 <b-row class="mb-4 text-center">
-                  <b-col sm="2">Вихід. файл</b-col>
+                  <b-col sm="2">Вихід. файл ХХ</b-col>
                   <b-col class="text-left" sm="6"><b-form-file v-model="outputFile"
                                                                ref="outF"
                                                                accept=".docx, .doc, .pdf"
@@ -308,10 +308,10 @@
               <div slot="modal-footer" class="w-100">
                 <b-btn class="float-left"
                        variant="danger"
-                       @click="removeViolation(this.violation.publicId, violation)">Видалити</b-btn>
+                       @click="removeViolation(violation.public_id, violation)">Видалити</b-btn>
                 <b-btn class="float-right"
                        variant="primary"
-                       @click="editViolation(violation.publicId, violation)">Ok</b-btn>
+                       @click="editViolation(violation.public_id, violation)">Ok</b-btn>
                 <b-btn class="float-right mx-2"
                        variant="secondary"
                        @click="hideEditModal">Close</b-btn>
